@@ -1,18 +1,25 @@
-import multiprocessing
-import zmq, time, pickle, sys, random
-from constPipe import * #-
+import zmq, time, pickle, random
+from constPipe import *  #-
 
-def producer(id, port):
-	context = zmq.Context()              
-	socket  = context.socket(zmq.PUSH)        # create a push socket
-	socket.bind("tcp://localhost:"+port)                             # bind socket to address
-	
-	for i in range(100):                  # generate 100 workloads
-		workload = random.randint(1, 100)   # compute workload
-		print ("Producer " + id + " sending workload item of size " + str(workload))
-		socket.send(pickle.dumps(workload)) # send workload to worker
+def producer():
+  context = zmq.Context()
+  socket  = context.socket(zmq.PUSH)          # create a push socket
+  socket.bind("tcp://*:" + PORT1)              # bind to port (filter connects here)
 
-if sys.argv[1] == '1':
-	producer('1', PORT1)
-elif sys.argv[1] == '2':
-	producer('2', PORT2)
+  print(f"[PRODUCER] Stage 1: sending tasks to Filter on port {PORT1}")
+  time.sleep(1)                                # wait for filter to connect
+
+  task_id = 0
+  while True:
+    task_id += 1
+    task = {                                   # new: richer task with priority
+      "id":         task_id,
+      "valor":      random.randint(1, 100),
+      "prioridade": random.choice(["ALTA", "MEDIA", "BAIXA"]),
+    }
+    print(f"[PRODUCER] Sending task #{task['id']:04d} | valor={task['valor']} | prioridade={task['prioridade']}")
+    socket.send(pickle.dumps(task))
+    time.sleep(random.uniform(0.3, 1.0))
+
+if __name__ == "__main__":
+  producer()

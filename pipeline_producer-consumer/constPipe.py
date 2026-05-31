@@ -1,4 +1,6 @@
-SRC1  = "98.90.53.6"
-SRC2  = "98.94.46.36"
-PORT1 = "5678"
-PORT2 = "5679"
+IP_PRODUCER = "44.202.253.173"  # server0 — producer
+IP_FILTER   = "52.91.72.141"    # peer1   — filter
+IP_CONSUMER = "44.208.20.168"   # peer2   — consumer
+
+PORT1 = "5678"   # producer -> filter
+PORT2 = "5679"   # filter   -> consumer
